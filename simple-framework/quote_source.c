@@ -30,13 +30,13 @@ int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
         //
         // TODO convert quote to python dict
         //
-        PyObject* pyQuote;
+        PyObject* pyQuote = 0;
         PyTuple_SetItem( args, 0, pyQuote );
         PyObject_CallObject( src->quoteCB, args );
 
         Py_DECREF( args );
         Py_DECREF( pyQuote );
-        src->quoteCB( quote );
+        //src->quoteCB( quote );
     }
     return 0;
 }
