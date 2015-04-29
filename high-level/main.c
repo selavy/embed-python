@@ -1,4 +1,8 @@
+#ifdef OS_X
 #include <Python/Python.h>
+#else
+#include <Python.h>
+#endif
 
 int
 main( int argc, char **argv )

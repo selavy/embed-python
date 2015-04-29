@@ -1,9 +1,14 @@
+#ifdef OS_X
 #include <Python/Python.h>
+#else
+#include <Python.h>
+#endif
+
 
 int
 main( int argc, char **argv )
 {
-    PyObject *pName, *pModule, *pDict, *pFunc, *sys, *path;
+    PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue;
     int i;
 
