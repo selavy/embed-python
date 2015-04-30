@@ -1,4 +1,4 @@
-def quoteCb( quote ):
+def quoteCb( quote, data ):
     print 'Python Quote Callback!'
     print 'Last Trade Price: $', quote["lt"]
     print 'Bid: $', quote["bid"]

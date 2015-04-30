@@ -19,6 +19,7 @@ int QuoteSource_Finalize( struct QuoteSource* src ) {
 
 int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
     char * txt = Quote_ToString( quote );
+    int ret = 0;
     printf( "[QuoteSource_HandleQuote] received quote: %s\n", txt );
     free( txt );
 
@@ -36,13 +37,15 @@ int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
             return 1;
         }
         PyTuple_SetItem( args, 0, pyQuote );
-        PyObject_CallObject( src->quoteCB, args );
+        if ( PyObject_CallObject( src->quoteCB, args ) == 0 ) {
+            ret = 1;
+        }
 
         Py_DECREF( args );
         Py_DECREF( pyQuote );
         //src->quoteCB( quote );
     }
-    return 0;
+    return ret;
 }
 
 int QuoteSource_SetQuoteCB( struct QuoteSource* src, PyObject* quoteCB ) {

@@ -102,7 +102,13 @@ int main( int argc, char **argv ) {
     quote.ask = 1000100;
     quote.lt =   990000;
 
-    QuoteSource_HandleQuote( &qsrc, &quote );
+    if ( QuoteSource_HandleQuote( &qsrc, &quote ) != 0 ) {
+        fprintf( stdout, "Failure in QuoteSource_HandleQuote!\n" );
+        if ( PyErr_Occurred() ) {
+            PyErr_PrintEx( 0 );
+            /* PyErr_Print(); */
+        }
+    }
 
     fprintf( stdout, "Destroying Quote Util..." );
     QuoteUtil_Finalize();
