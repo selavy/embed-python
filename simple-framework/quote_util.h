@@ -8,8 +8,17 @@
 #endif
 #include "quote.h"
 
-int QuoteUtil_Initialize( void );
-int QuoteUtil_Finalize( void );
-PyObject * QuoteUtil_QuoteToDict( struct Quote * quote );
+struct QuoteUtil {
+    PyObject * LastTradeString;
+    PyObject * BidString;
+    PyObject * AskString;
+    PyObject * LastTradeValue;
+    PyObject * BidValue;
+    PyObject * AskValue;
+};
+
+int QuoteUtil_Initialize( struct QuoteUtil * util );
+int QuoteUtil_Finalize( struct QuoteUtil * util );
+PyObject * QuoteUtil_QuoteToDict( struct QuoteUtil * util, struct Quote * quote );
 
 #endif // QUOTE_UTIL__H_

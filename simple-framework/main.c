@@ -12,6 +12,7 @@
 int main( int argc, char **argv ) {
     struct QuoteSource qsrc;
     struct Quote quote;
+    struct QuoteUtil util;
     char * DefaultModule = "quote_callback";
     char * DefaultFunction = "quoteCb";
     char * moduleName;
@@ -40,13 +41,6 @@ int main( int argc, char **argv ) {
     }    
     fprintf( stdout, " Success.\n" );
 
-    fprintf( stdout, "Loading Quote Source..." );
-    if ( QuoteSource_Initialize( &qsrc ) != 0 ) {
-        fprintf( stdout, "Failure!\nUnable to initialize Quote Source!\n" );
-        PythonModuleLoader_Finalize();
-        exit( 1 );
-    }
-    fprintf( stdout, " Success.\n" );
 
     fprintf( stdout, "Loading Quote..." );
     if ( Quote_Initialize( &quote ) != 0 ) {
@@ -58,8 +52,16 @@ int main( int argc, char **argv ) {
     fprintf( stdout, " Success.\n" );
 
     fprintf( stdout, "Loading Quote Util Module..." );
-    if ( QuoteUtil_Initialize() != 0 ) {
+    if ( QuoteUtil_Initialize( &util ) != 0 ) {
         fprintf( stdout, "Failure!\nUnable to load Quote Util Module!\n" );
+        exit( 1 );
+    }
+    fprintf( stdout, " Success.\n" );
+
+    fprintf( stdout, "Loading Quote Source..." );
+    if ( QuoteSource_Initialize( &qsrc, &util ) != 0 ) {
+        fprintf( stdout, "Failure!\nUnable to initialize Quote Source!\n" );
+        PythonModuleLoader_Finalize();
         exit( 1 );
     }
     fprintf( stdout, " Success.\n" );
@@ -106,12 +108,11 @@ int main( int argc, char **argv ) {
         fprintf( stdout, "Failure in QuoteSource_HandleQuote!\n" );
         if ( PyErr_Occurred() ) {
             PyErr_PrintEx( 0 );
-            /* PyErr_Print(); */
         }
     }
 
     fprintf( stdout, "Destroying Quote Util..." );
-    QuoteUtil_Finalize();
+    QuoteUtil_Finalize( &util );
     fprintf( stdout, " Success.\n" );
 
     fprintf( stdout, "Destroying Quote Object..." );

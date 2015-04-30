@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include "quote_util.h"
 
-int QuoteSource_Initialize( struct QuoteSource* src ) {
+int QuoteSource_Initialize( struct QuoteSource* src, struct QuoteUtil* util ) {
     src->quoteCB = 0;
+    src->util = util;
     return 0;
 }
 
@@ -32,7 +33,7 @@ int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
         //
         // TODO convert quote to python dict
         //
-        PyObject* pyQuote = QuoteUtil_QuoteToDict( quote );
+        PyObject* pyQuote = QuoteUtil_QuoteToDict( src->util, quote );
         if ( !pyQuote ) {
             return 1;
         }
