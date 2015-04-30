@@ -1,13 +1,13 @@
 #ifndef QUOTE_SOURCE__H_
 #define QUOTE_SOURCE__H_
 
-#include "quote.h"
 
 #ifdef OS_X
 #include <Python/Python.h>
 #else
 #include <Python.h>
 #endif
+#include "quote.h"
 
 struct QuoteSource {
 //    void (*quoteCB)( struct Quote* quote );
