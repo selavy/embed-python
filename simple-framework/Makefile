@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -g -O0
 OBJS = main.o quote_source.o quote.o python_module_loader.o
 INC = `python2.7-config --cflags` 
 LIBS = `python2.7-config --ldflags`

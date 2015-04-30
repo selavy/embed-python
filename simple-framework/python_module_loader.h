@@ -7,10 +7,22 @@
 #include <Python.h>
 #endif
 
-struct PythonModuleLoader {};
+/*
+ * TODO (plesslie);
+ * for safer typing, create structs around PyObject* with a module
+ * and a struct around PyObject* with callable.
+ */
 
-int PythonModuleLoader_Initialize( struct PythonModuleLoader* loader );
-PyObject* PythonModuleLoader_LoadModule( struct PythonModuleLoader* loader, char * moduleName );
-int PythonModuleLoader_Finalize( struct PythonModuleLoader* loader );
+/*
+ * typedef void* Module;
+ * typedef void* Callable;
+ */
+
+int PythonModuleLoader_Initialize( char * progName );
+PyObject * PythonModuleLoader_LoadModule( char * moduleName );
+int PythonModuleLoader_UnloadModule( PyObject * module );
+PyObject * PythonModuleLoader_LoadFunctionFromModule( PyObject * module, char * functionName );
+int PythonModuleLoader_UnloadFunctionFromModule( PyObject * object );
+int PythonModuleLoader_Finalize( void );
 
 #endif
