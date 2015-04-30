@@ -1,6 +1,7 @@
 #include "quote_source.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "quote_util.h"
 
 int QuoteSource_Initialize( struct QuoteSource* src ) {
     src->quoteCB = 0;
@@ -30,7 +31,10 @@ int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
         //
         // TODO convert quote to python dict
         //
-        PyObject* pyQuote = 0;
+        PyObject* pyQuote = QuoteUtil_QuoteToDict( quote );
+        if ( !pyQuote ) {
+            return 1;
+        }
         PyTuple_SetItem( args, 0, pyQuote );
         PyObject_CallObject( src->quoteCB, args );
 
@@ -42,7 +46,7 @@ int QuoteSource_HandleQuote( struct QuoteSource* src, struct Quote* quote ) {
 }
 
 int QuoteSource_SetQuoteCB( struct QuoteSource* src, PyObject* quoteCB ) {
-    if ( !quoteCB || PyCallable_Check( quoteCB ) ) {
+    if ( !quoteCB || !PyCallable_Check( quoteCB ) ) {
         return 1;
     }
 

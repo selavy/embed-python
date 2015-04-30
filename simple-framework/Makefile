@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g -O0
-OBJS = main.o quote_source.o quote.o python_module_loader.o
+OBJS = main.o quote_source.o quote.o python_module_loader.o quote_util.o
 INC = `python2.7-config --cflags` 
 LIBS = `python2.7-config --ldflags`
 EXE=simple
@@ -15,6 +15,8 @@ quote.o: quote.h quote.c
 	$(CC) $(CFLAGS) -c quote.c $(INC)
 python_module_loader.o: python_module_loader.h python_module_loader.c
 	$(CC) $(CFLAGS) -c python_module_loader.c $(INC)
+quote_util.o: quote_util.h quote_util.c
+	$(CC) $(CFLAGS) -c quote_util.c $(INC)
 
 .PHONY: clean
 clean:

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "python_module_loader.h"
 #include "quote_source.h"
+#include "quote_util.h"
 
 int main( int argc, char **argv ) {
     struct QuoteSource qsrc;
@@ -56,6 +57,13 @@ int main( int argc, char **argv ) {
     }
     fprintf( stdout, " Success.\n" );
 
+    fprintf( stdout, "Loading Quote Util Module..." );
+    if ( QuoteUtil_Initialize() != 0 ) {
+        fprintf( stdout, "Failure!\nUnable to load Quote Util Module!\n" );
+        exit( 1 );
+    }
+    fprintf( stdout, " Success.\n" );
+
     printf( "Loading Module '%s'...", moduleName ); 
     module = PythonModuleLoader_LoadModule( moduleName );
     if ( !module ) {
@@ -79,19 +87,46 @@ int main( int argc, char **argv ) {
     }
     fprintf( stdout, " Success.\n" );
 
+    fprintf( stdout, "Registering Python Quote Callback..." );
+    if ( QuoteSource_SetQuoteCB( &qsrc, function ) != 0 ) {
+        fprintf( stdout, "Failure!\nUnable to register Python Quote Callback\n" );
+        PythonModuleLoader_UnloadModule( module );
+        PythonModuleLoader_Finalize();
+        QuoteSource_Finalize( &qsrc );
+        Quote_Initialize( &quote );
+        exit( 1 );
+    }
+    fprintf( stdout, " Success.\n" );
+
     quote.bid = 1000000;
     quote.ask = 1000100;
     quote.lt =   990000;
 
     QuoteSource_HandleQuote( &qsrc, &quote );
 
+    fprintf( stdout, "Destroying Quote Util..." );
+    QuoteUtil_Finalize();
+    fprintf( stdout, " Success.\n" );
+
+    fprintf( stdout, "Destroying Quote Object..." );
     Quote_Finalize( &quote );
+    fprintf( stdout, " Success.\n" );
 
+    fprintf( stdout, "Destroying Quote Source..." );
     QuoteSource_Finalize( &qsrc );
+    fprintf( stdout, " Success.\n" );
 
+    fprintf( stdout, "Unloading Python Function Object From Module..." );
+    PythonModuleLoader_UnloadFunctionFromModule( function );
+    fprintf( stdout, " Success.\n" );
+
+    fprintf( stdout, "Unloading Python Module..." );
     PythonModuleLoader_UnloadModule( module );
+    fprintf( stdout, " Success.\n" );
 
+    fprintf( stdout, "Destroying Python Module Loader..." );
     PythonModuleLoader_Finalize();
+    fprintf( stdout, " Success.\n" );
 
     return 0;
 }
