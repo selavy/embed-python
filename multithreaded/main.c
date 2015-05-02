@@ -19,8 +19,8 @@ int main( int argc, char *argv[] ) {
     pthread_attr_t *attrs;
     int nthreads;
     int i;
-   /* struct ThreadArguments *args;
-    void *res; */
+    struct ThreadArguments *args;
+    void *res;
 
     if ( argc < 2 ) {
         printf( "Usage: %s [MODULE NAME]...\n", argv[0] );
@@ -38,10 +38,34 @@ int main( int argc, char *argv[] ) {
         perror( "malloc" );
         exit( 0 );
     }
+    args = malloc( nthreads * sizeof( *args ) );
+    if ( !args ) {
+        perror( "malloc" );
+        exit( 0 );
+    }
 
     for ( i = 0; i < nthreads; ++i ) {
         if ( 0 != pthread_attr_init( &(attrs[i]) ) ) {
             perror( "pthread_attr_init" );
+            exit( 0 );
+        }
+        args[i].tid = i;
+        args[i].prog = argv[0];
+        args[i].module = argv[i+1];
+        printf( "creating arguments for thread: %d, module: '%s'\n", i, argv[i+1] );
+    }
+
+    /* begin creating threads */
+    for ( i = 0; i < nthreads; ++i ) {
+        if ( 0 != pthread_create( &(threads[i]), &(attrs[i]), routine, (void*) &(args[i]) ) ) {
+            perror( "pthread_create" );
+            exit( 0 );
+        }
+    }
+
+    for ( i = 0; i < nthreads; ++i ) {
+        if ( 0 != pthread_join( threads[i], &res ) ) {
+            perror( "pthread_join" );
             exit( 0 );
         }
     }
@@ -53,8 +77,10 @@ int main( int argc, char *argv[] ) {
             exit( 0 );
         }
     }
+
+    free( threads );
     free( attrs );
-    free( threads);
+    free( args );
 
 /*
 
