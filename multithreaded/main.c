@@ -63,6 +63,15 @@ int main( int argc, char *argv[] ) {
         }
     }
 
+    /* no longer need attrs so clean up */
+    for ( i = 0; i < nthreads; ++i ) {
+        if ( 0 != pthread_attr_destroy( &(attrs[i]) ) ) {
+            perror( "pthread_attr_destroy" );
+            exit( 0 );
+        }
+    }
+    free( attrs );
+
     for ( i = 0; i < nthreads; ++i ) {
         if ( 0 != pthread_join( threads[i], &res ) ) {
             perror( "pthread_join" );
@@ -70,16 +79,8 @@ int main( int argc, char *argv[] ) {
         }
     }
 
-    /* clean up threads and attrs */
-    for ( i = 0; i < nthreads; ++i ) {
-        if ( 0 != pthread_attr_destroy( &(attrs[i]) ) ) {
-            perror( "pthread_attr_destroy" );
-            exit( 0 );
-        }
-    }
-
+    /* clean up threads and args */
     free( threads );
-    free( attrs );
     free( args );
 
 /*
