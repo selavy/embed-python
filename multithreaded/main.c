@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <Python.h>
 
 struct ThreadArguments {
     int tid;
@@ -8,9 +9,34 @@ struct ThreadArguments {
     char *module;
 };
 
+#define FUNCTION "callback"
+
 void *routine( void *arg ) {
-    int *n = (int*) arg;
-    printf("routine(%d)\n", *n);
+    struct ThreadArguments *args = (struct ThreadArguments*) arg;
+    PyObject *function, *module, *argument, *name, *value;
+    printf( "Begin thread[%d] to load module(%s)\n", args->tid, args->module );
+    Py_SetProgramName( args->prog );
+    Py_Initialize();
+    name = PyString_FromString( args->module );
+    if ( !name ) { perror( "PyString_FromString" ); pthread_exit( 0 ); }
+    module = PyImport_Import( name );
+    if ( !module ) { PyErr_Print(); perror( "PyImport_Import" ); pthread_exit( 0 ); }
+    Py_DECREF( name );
+    function = PyObject_GetAttrString( module, FUNCTION );
+    if ( !function || !PyCallable_Check( function ) ) {
+        if ( PyErr_Occurred() ) {
+            PyErr_Print();
+        }
+        fprintf( stderr, "'%s' is not a callable object in '%s'\n", FUNCTION, args->module );
+        pthread_exit( 0 );
+    }
+    argument = PyTuple_New( 1 );
+    value = PyInt_FromLong( args->tid );
+    if ( !value ) { perror( "PyInt_FromLong" ); pthread_exit( 0 ); }
+    PyTuple_SetItem( argument, 0, value );
+    value = PyObject_CallObject( function, argument );
+    Py_DECREF( argument );
+    Py_Finalize();
     pthread_exit( 0 );
 }
 

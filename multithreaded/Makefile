@@ -5,7 +5,7 @@ MSAN=-fsanitize=memory
 ASAN=-fsanitize=address
 #SANITIZER=$(ASAN)
 SANITIZER=
-CFLAGS=-Wall -Werror -g -O0 $(SANITIZER)
+CFLAGS=-Wall -Werror -g -O0 $(SANITIZER) `python2.7-config --cflags` `python2.7-config --ldflags`
 LIBS=-lpthread
 
 OBJS = main.o
