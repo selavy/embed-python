@@ -3,7 +3,8 @@ SANITIZE=-pie -fPIC
 TSAN=-fsanitize=thread $(SANITIZE)
 MSAN=-fsanitize=memory
 ASAN=-fsanitize=address
-SANITIZER=$(ASAN)
+#SANITIZER=$(ASAN)
+SANITIZER=
 CFLAGS=-Wall -Werror -g -O0 $(SANITIZER)
 LIBS=-lpthread
 

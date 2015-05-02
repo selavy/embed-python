@@ -2,7 +2,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define N 10
+struct ThreadArguments {
+    int tid;
+    char *prog;
+    char *module;
+};
 
 void *routine( void *arg ) {
     int *n = (int*) arg;
@@ -11,11 +15,48 @@ void *routine( void *arg ) {
 }
 
 int main( int argc, char *argv[] ) {
-    pthread_t thread[N];
-    pthread_attr_t attr[N];
+    pthread_t *threads;
+    pthread_attr_t *attrs;
+    int nthreads;
     int i;
-    int arg[N];
-    void *res;
+   /* struct ThreadArguments *args;
+    void *res; */
+
+    if ( argc < 2 ) {
+        printf( "Usage: %s [MODULE NAME]...\n", argv[0] );
+        exit( 0 );
+    }
+
+    nthreads = argc - 1;
+    threads = malloc( nthreads * sizeof( *threads ) );
+    if ( !threads ) {
+        perror( "malloc" );
+        exit( 0 );
+    }
+    attrs = malloc( nthreads * sizeof( *attrs ) );
+    if ( !attrs ) {
+        perror( "malloc" );
+        exit( 0 );
+    }
+
+    for ( i = 0; i < nthreads; ++i ) {
+        if ( 0 != pthread_attr_init( &(attrs[i]) ) ) {
+            perror( "pthread_attr_init" );
+            exit( 0 );
+        }
+    }
+
+    /* clean up threads and attrs */
+    for ( i = 0; i < nthreads; ++i ) {
+        if ( 0 != pthread_attr_destroy( &(attrs[i]) ) ) {
+            perror( "pthread_attr_destroy" );
+            exit( 0 );
+        }
+    }
+    free( attrs );
+    free( threads);
+
+/*
 
     for ( i = 0; i < N; ++i ) {
         arg[i] = i+1;
@@ -48,6 +89,6 @@ int main( int argc, char *argv[] ) {
             exit( 1 );
         }
     }
-
+*/
     return 0;
 }
