@@ -1,5 +1,10 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g -O0
+SANITIZE=-pie -fPIC
+TSAN=-fsanitize=thread $(SANITIZE)
+MSAN=-fsanitize=memory
+ASAN=-fsanitize=address
+SANITIZER=$(ASAN)
+CFLAGS=-Wall -Werror -g -O0 $(SANITIZER)
 LIBS=-lpthread
 
 OBJS = main.o

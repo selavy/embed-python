@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#define N 10
+
 void *routine( void *arg ) {
     int *n = (int*) arg;
     printf("routine(%d)\n", *n);
@@ -9,50 +11,42 @@ void *routine( void *arg ) {
 }
 
 int main( int argc, char *argv[] ) {
-    pthread_t thread1, thread2;
-    pthread_attr_t attr1, attr2;
-    int i, j;
+    pthread_t thread[N];
+    pthread_attr_t attr[N];
+    int i;
+    int arg[N];
     void *res;
 
-    if (0 != pthread_attr_init(&attr1)) {
-        perror( "attr1" );
-        exit( 1 );
-    }
-    if (0 != pthread_attr_init(&attr2)) {
-        perror( "attr2" );
-        exit( 1 );
+    for ( i = 0; i < N; ++i ) {
+        arg[i] = i+1;
     }
 
-    i = 1;
-    j = 2;
-    if ( 0 != pthread_create( &thread1, &attr1, routine, (void*) &i ) ) {
-        perror( "pthread_create( thread1 )" );
-        exit( 1 );
+    for ( i = 0; i < N; ++i ) {
+        if (0 != pthread_attr_init( &(attr[i]) ) ) {
+            perror( "pthread_attr_init" );
+            exit( 1 );
+        }
     }
 
-    if ( 0 != pthread_create( &thread2, &attr2, routine, (void*) &j ) ) {
-        perror( "pthread_create( thread2 )" );
-        exit( 1 );
+    for ( i = 0; i < N; ++i ) {
+        if ( 0 != pthread_create( &(thread[i]), &(attr[i]), routine, (void*) &(arg[i]) ) ) {
+            perror( "pthread_create" );
+            exit( 1 );
+        }
     }
 
-    if ( 0 != pthread_attr_destroy( &attr1 ) ) {
-        perror( "pthread_attr_destroy( attr1 )" );
-        exit( 1 );
+    for ( i = 0; i < N; ++i ) {
+        if ( 0 != pthread_attr_destroy( &(attr[i]) ) ) {
+            perror( "pthread_attr_destroy" );
+            exit( 1 );
+        }
     }
 
-    if ( 0 != pthread_attr_destroy( &attr2 ) ) {
-        perror( "pthread_attr_destroy( attr2 )" );
-        exit( 1 );
-    }
-
-    if ( 0 != pthread_join( thread1, &res ) ) {
-        perror( "pthread_join( thread1 )" );
-        exit( 1 );
-    }
-
-    if ( 0 != pthread_join( thread2, &res ) ) {
-        perror( "pthread_join( thread2 )" );
-        exit( 1 );
+    for ( i = 0; i < N; ++i ) {
+        if ( 0 != pthread_join( thread[i], &res ) ) {
+            perror( "pthread_join" );
+            exit( 1 );
+        }
     }
 
     return 0;
