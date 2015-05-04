@@ -26,7 +26,9 @@ DoChildProc(char *prog, char *mod, char *func) {
 
     function = PyObject_GetAttrString( module, func );
     if ( function && PyCallable_Check( function ) ) {
-        args = PyTuple_New( 0 );
+        args = PyTuple_New( 1 );
+        value = PyInt_FromLong( getpid() );
+        PyTuple_SetItem( args, 0, value );
         value = PyObject_CallObject( function, args );
     } else {
         printf( "Cannot find function \"%s\"\n", func );

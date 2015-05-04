@@ -1,2 +1,2 @@
-def callable():
-    print 'Inside python!'
+def callable( pid ):
+    print 'Inside python! pid = ', pid
