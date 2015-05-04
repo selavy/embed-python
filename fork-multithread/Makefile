@@ -1,6 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -O0 -g
-LIBS=
+INC = `python2.7-config --cflags`
+LIBS = `python2.7-config --ldflags` $(INC)
 OBJS=main.o
 EXE=forker
 

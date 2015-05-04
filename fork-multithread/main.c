@@ -2,6 +2,41 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <Python.h>
+
+void
+DoChildProc(char *prog, char *mod, char *func) {
+    PyObject *value, *module, *function, *args;
+    Py_SetProgramName( prog );
+    Py_Initialize();
+    value = PyString_FromString( mod );
+    if ( !value ) {
+        perror( "PyString_FromString" );
+        goto finalize;
+    }
+
+    module = PyImport_Import( value );
+    Py_DECREF( value );
+    if ( !module ) {
+        if ( PyErr_Occurred() ) {
+            PyErr_Print();
+        }
+        goto finalize;
+    }
+
+    function = PyObject_GetAttrString( module, func );
+    if ( function && PyCallable_Check( function ) ) {
+        args = PyTuple_New( 0 );
+        value = PyObject_CallObject( function, args );
+    } else {
+        printf( "Cannot find function \"%s\"\n", func );
+    }
+    Py_XDECREF( function );
+    Py_DECREF( module );
+
+finalize:
+    Py_Finalize();
+}
 
 int
 main( int argc, char *argv[] ) {
@@ -15,11 +50,11 @@ main( int argc, char *argv[] ) {
         exit( 0 );
     }
     else if ( pid == 0 ) {
-
-        printf( "in child!\n" );
+        printf( "in child! pid = %d\n", getpid() );
+        DoChildProc( argv[0], "simple", "callable" );
     }
     else {
-        printf( "in parent! pid = %d\n", pid );
+        printf( "in parent! parent pid = %d, child pid = %d\n", getpid(), pid );
         do {
             w = waitpid( pid, &status, WUNTRACED | WCONTINUED );
             if ( w == -1 ) {
